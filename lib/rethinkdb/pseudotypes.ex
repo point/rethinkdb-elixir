@@ -51,7 +51,7 @@ defmodule RethinkDB.Pseudotypes do
         :raw ->
           %__MODULE__{epoch_time: epoch_time, timezone: timezone}
         _ ->
-          {seconds, ""} = Calendar.ISO.parse_offset(timezone)
+          {:ok, _, seconds} = Calendar.ISO.parse_utc_datetime("1970-01-01T00:00:00.000" <> timezone)
           zone_abbr = case seconds do
               0 -> "UTC"
               _ -> timezone
@@ -68,7 +68,7 @@ defmodule RethinkDB.Pseudotypes do
           end
           epoch_time * 1000
             |> trunc()
-            |> DateTime.from_unix!(:milliseconds)
+            |> DateTime.from_unix!(:millisecond)
             |> struct(utc_offset: seconds, zone_abbr: zone_abbr, time_zone: time_zone)
       end
     end
